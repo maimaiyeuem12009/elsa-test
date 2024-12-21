@@ -2,12 +2,21 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import useNameStore from "@/store/name"
 import { trpc } from "@/trpc/client"
-import { count } from "console"
 import { Trophy, Users } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export function QuizRoomCard() {
   const { data: rooms, error, isLoading } = trpc.quizz.getAll.useQuery()
+  const { id: userId, name } = useNameStore()
+  const joinMutation = trpc.quizz.joinQuizz.useMutation()
+
+  const joinQuizz = (quizzId: number) => {
+    joinMutation.mutateAsync({quizzId, userId, name}).then(() => router.push(`/quizz/${quizzId}`))
+  }
+
+  const router = useRouter()
 
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>Error: {error.message}</div>
@@ -30,7 +39,7 @@ export function QuizRoomCard() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button className="w-full" variant={"default"}>
+            <Button className="w-full" variant={"default"} onClick={() => joinQuizz(room.id)}>
               <Trophy className="mr-2 h-4 w-4" />
               {"Join Now"}
             </Button>

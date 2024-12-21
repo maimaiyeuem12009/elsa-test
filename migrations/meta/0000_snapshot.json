@@ -1,5 +1,5 @@
 {
-  "id": "ec8f8f86-3015-42a0-b059-2219ef2509b4",
+  "id": "fe92ee51-be82-42be-b9db-077abdc8cab0",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -55,6 +55,80 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.quizz_player": {
+      "name": "quizz_player",
+      "schema": "",
+      "columns": {
+        "quizz_id": {
+          "name": "quizz_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "player_id": {
+          "name": "player_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "completed_questions": {
+          "name": "completed_questions",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "score": {
+          "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "quizz_player_quizz_id_quizz_id_fk": {
+          "name": "quizz_player_quizz_id_quizz_id_fk",
+          "tableFrom": "quizz_player",
+          "tableTo": "quizz",
+          "columnsFrom": [
+            "quizz_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "quizz_player_player_id_player_id_fk": {
+          "name": "quizz_player_player_id_player_id_fk",
+          "tableFrom": "quizz_player",
+          "tableTo": "player",
+          "columnsFrom": [
+            "player_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "quizz_player_quizz_id_player_id_pk": {
+          "name": "quizz_player_quizz_id_player_id_pk",
+          "columns": [
+            "quizz_id",
+            "player_id"
+          ]
+        }
+      },
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},

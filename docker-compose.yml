@@ -30,6 +30,16 @@ services:
       timeout: 5s
       retries: 5
 
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    ports:
+      - "8001:5540"
+    volumes:
+      - redis-insight:/db
+    depends_on:
+      - redis
+
 volumes:
   postgres_data:
   redis_data:
+  redis-insight:

@@ -1,5 +1,5 @@
 import { questionSchema } from "@/validator/question";
-import { text, pgTable, serial, jsonb, integer } from "drizzle-orm/pg-core";
+import { text, pgTable, serial, jsonb, integer, primaryKey } from "drizzle-orm/pg-core";
 import { createInsertSchema, create } from 'drizzle-zod';
 import { z } from "zod";
 export const player = pgTable("player", {
@@ -18,19 +18,14 @@ export const quizzInsert = createInsertSchema(quizz).extend({
 })
 
 export const quizzPlayer = pgTable("quizz_player", {
-  id: serial('id').primaryKey(),
   quizzId: serial('quizz_id').references(() => quizz.id, { onDelete: 'cascade' }),
   playerId: serial('player_id').references(() => player.id, { onDelete: 'cascade' }),
   completedQuestions: integer("completed_questions").default(0),
   score: integer("score").default(0),
+}, (table) => {
+  return {
+    pk: primaryKey({ columns: [table.quizzId, table.playerId] }),
+  }
 })
 
 export const quizzPlayerInsert = createInsertSchema(quizzPlayer)
-
-// SELECT * 
-// FROM quizz
-// LEFT JOIN quizz_player
-// WHERE quizz.id = 11
-// on quizz.id = quizz_player.quizz_id
-
-// syntax error at or near "WHERE"

@@ -5,19 +5,20 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { trpc } from '@/trpc/client'
 import useNameStore from '@/store/name'
-import { quizzPlayerInsert } from '@/db/schema'
 import { z } from 'zod'
-import { RemoveOptional } from '@/types'
 import { questionSchema } from '@/validator/question'
 import { useParams, useRouter } from 'next/navigation'
 import { Scoreboard } from './ScoreBoard'
+import { useQueryClient } from '@tanstack/react-query'
 
 const QUESTION_TIME = 20 // seconds
 const MAX_POINTS = 1000
 
 interface QuizProps {
-  quizData: RemoveOptional<z.infer<typeof quizzPlayerInsert>> & {
+  quizData: {
     question: z.infer<typeof questionSchema>
+    completedQuestions: number
+    score: number
   }
 }
 
@@ -30,13 +31,14 @@ const mockScores = [
   { name: "Eve", score: 1700, id: 5 },
 ]
 
-const userScore = { name: "Bob", score: 1800, id: 2 }
-
 export default function Quiz({ quizData: { question , completedQuestions, score}}: QuizProps) {
   const { id: userId, name } = useNameStore()
   const { id: quizzId } = useParams<{ id: string}>()
   const router = useRouter()
   const [currentQuestion, setCurrentQuestion] = useState(completedQuestions)
+  const client = useQueryClient()
+
+  console.log('quizData', { question, completedQuestions, score })
   const isQuizFinished = currentQuestion === question.length
   const [timeLeft, setTimeLeft] = useState(QUESTION_TIME)
   const [points, setPoints] = useState(0)
@@ -48,11 +50,15 @@ export default function Quiz({ quizData: { question , completedQuestions, score}
       updateQuizz.mutate({
         userId: userId,
         quizzId: Number(quizzId),
+        name: name,
         result: {
           score: totalPoints,
           completedQuestions: currentQuestion + 1,
         }
       })
+      client.invalidateQueries({ queryKey: [["quizz","getQuizz"],{"input":{"id": quizzId,userId},"type":"query"}]
+      })
+
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showResult])

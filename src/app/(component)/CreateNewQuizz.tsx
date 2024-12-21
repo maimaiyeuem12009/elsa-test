@@ -17,6 +17,7 @@ import { questionSchema } from "@/validator/question"
 import { trpc } from "@/trpc/client"
 import useNameStore from "@/store/name"
 import { useRouter } from "next/navigation"
+import { useQueryClient } from "@tanstack/react-query"
 
 const readJson = (file: File) => {
   return new Promise<z.infer<typeof questionSchema>>((resolve) => {
@@ -40,8 +41,9 @@ const formSchema = z.object({
 })
 
 export function CreateNewQuizz() {
+  const client = useQueryClient()
   const router = useRouter()
-  const { id } = useNameStore()
+  const { id, name } = useNameStore()
   const createQuizz = trpc.quizz.create.useMutation()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -50,12 +52,24 @@ export function CreateNewQuizz() {
     },
   })
 
-  const onSubmit = async(data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     const jsonData = await readJson(data.file)
     const newQuizz = await createQuizz.mutateAsync({
       title: data.title,
       question: jsonData,
+      name,
       userId: id
+    })
+    client.invalidateQueries({
+      queryKey: [
+        [
+          "quizz",
+          "getAll"
+        ],
+        {
+          "type": "query"
+        }
+      ]
     })
     router.push(`/quizz/${newQuizz[0].id}`)
   }

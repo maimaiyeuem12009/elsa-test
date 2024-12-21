@@ -1,8 +1,11 @@
+
 import { createTRPCRouter } from '../init';
-import { todoRouter } from './todo';
+import { playerRouter } from './player';
+import { quizzRouter } from './quizz';
 
 export const appRouter = createTRPCRouter({
-  todo: todoRouter,
+  quizz: quizzRouter,
+  player: playerRouter,
 });
 
 // export type definition of API

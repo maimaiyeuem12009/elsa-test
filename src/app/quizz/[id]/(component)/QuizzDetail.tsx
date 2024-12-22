@@ -11,40 +11,46 @@ import { useParams, useRouter } from 'next/navigation'
 import { Scoreboard } from './ScoreBoard'
 import { useQueryClient } from '@tanstack/react-query'
 
+// Constants
 const QUESTION_TIME = 20 // seconds
 const MAX_POINTS = 1000
+const BUTTON_COLORS = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500']
 
+// Types and Interfaces
 interface QuizProps {
   quizData: {
     question: z.infer<typeof questionSchema>
     completedQuestions: number
     score: number
+    name: string
   }
 }
 
-// Mock data for the scoreboard
-const mockScores = [
-  { name: "Alice", score: 2500, id: 1 },
-  { name: "Bob", score: 2300, id: 2 },
-  { name: "Charlie", score: 2100, id: 3 },
-  { name: "David", score: 1900, id: 4 },
-  { name: "Eve", score: 1700, id: 5 },
-]
 
-export default function Quiz({ quizData: { question , completedQuestions, score}}: QuizProps) {
+export default function Quiz({ quizData: { question, completedQuestions, score, name: quizName }}: QuizProps) {
+  // Hooks and State Management
+
+  console.log({
+    completedQuestions,
+    score
+  })
   const { id: userId, name } = useNameStore()
   const { id: quizzId } = useParams<{ id: string}>()
   const router = useRouter()
-  const [currentQuestion, setCurrentQuestion] = useState(completedQuestions)
   const client = useQueryClient()
+  const updateQuizz = trpc.quizz.updateQuizz.useMutation()
 
-  console.log('quizData', { question, completedQuestions, score })
-  const isQuizFinished = currentQuestion === question.length
+  // Quiz State
+  const [currentQuestion, setCurrentQuestion] = useState(completedQuestions)
   const [timeLeft, setTimeLeft] = useState(QUESTION_TIME)
   const [points, setPoints] = useState(0)
   const [totalPoints, setTotalPoints] = useState(score)
   const [showResult, setShowResult] = useState(false)
 
+  // Derived State
+  const isQuizFinished = currentQuestion === question.length
+
+  // Effects
   useEffect(() => {
     if (showResult === true) {
       updateQuizz.mutate({
@@ -56,15 +62,13 @@ export default function Quiz({ quizData: { question , completedQuestions, score}
           completedQuestions: currentQuestion + 1,
         }
       })
-      client.invalidateQueries({ queryKey: [["quizz","getQuizz"],{"input":{"id": quizzId,userId},"type":"query"}]
+      client.invalidateQueries({ 
+        queryKey: [["quizz","getQuizz"], {"input":{"id": quizzId,userId},"type":"query"}]
       })
-
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showResult])
 
-  
-  const updateQuizz = trpc.quizz.updateQuizz.useMutation()
 
   // const 
 
@@ -78,10 +82,10 @@ export default function Quiz({ quizData: { question , completedQuestions, score}
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft, showResult])
 
+  // Event Handlers
   const handleAnswer = (selectedAnswer: string) => {
     const isCorrect = selectedAnswer === question[currentQuestion].answer
     const earnedPoints = isCorrect ? Math.round((timeLeft / QUESTION_TIME) * MAX_POINTS) : 0
-    console.log('handleAnswer', { earnedPoints, totalPoints, newTotal: totalPoints + earnedPoints })
     setPoints(earnedPoints)
     setTotalPoints(totalPoints + earnedPoints)
     setShowResult(true)
@@ -93,23 +97,26 @@ export default function Quiz({ quizData: { question , completedQuestions, score}
       setTimeLeft(QUESTION_TIME)
       setShowResult(false)
     } else {
-      // Quiz finished
       alert(`Quiz completed! Total points: ${totalPoints + points}`)
     }
   }
 
-  const buttonColors = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500']
 
+  const { data } = trpc.quizz.testGetList.useSubscription({quizzId: Number(quizzId)})
+  const dataTransformed = data?.map((item) => ({
+    name: item.value,
+    score: item.score
+  })) || []
   return (
     <Card className="w-full max-w-2xl mx-auto mt-10">
       <CardHeader>
-        <Scoreboard scores={mockScores} userScore={{
-          id: userId,
+        <Scoreboard scores={dataTransformed} userScore={{
           name,
           score: totalPoints,
         }} />
-        { timeLeft }
-        <CardTitle className="text-2xl font-bold text-center">{isQuizFinished ? "Your result ": `Quiz Question ${currentQuestion + 1}`}</CardTitle>
+        <CardTitle>
+          <h2 className="text-2xl font-bold text-center mb-4">{quizName}</h2>
+          {isQuizFinished ? "Your result ": `Quiz Question ${currentQuestion + 1}`}</CardTitle>
       </CardHeader>
       <CardContent>
         {isQuizFinished 
@@ -124,7 +131,7 @@ export default function Quiz({ quizData: { question , completedQuestions, score}
           {question[currentQuestion].options.map((option, index) => (
             <Button
               key={index}
-              className={`${buttonColors[index]} hover:opacity-80 text-white p-4 text-lg h-auto`}
+              className={`${BUTTON_COLORS[index]} hover:opacity-80 text-white p-4 text-lg h-auto`}
               onClick={() => handleAnswer(option.charAt(0))}
               disabled={showResult}
             >

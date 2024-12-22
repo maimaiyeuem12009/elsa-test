@@ -4,10 +4,24 @@ import { db } from '@/db/drizzle';
 import { quizz, quizzInsert, quizzPlayer } from '@/db/schema';
 import RedisClient from '@/redis';
 import { eq, desc, sql, and } from 'drizzle-orm';
+import EventEmitter from 'events';
 import { z } from 'zod';
 
 const client = await RedisClient.getInstance()
 
+const subscriber = client.duplicate()
+
+const ee = new EventEmitter()
+
+await subscriber.connect();
+subscriber.subscribe('__keyevent@0__:zadd', async (channel) => {
+  console.log('Received event', channel)
+  const room = channel.split(':')[1]
+  const data = await client.zRangeWithScores(`quizz:${room}`, 0, 2, {
+    REV: true
+  })
+  ee.emit(room, data)
+})
 
 export const quizzRouter = createTRPCRouter({
   getAll: baseProcedure.query(async () => {
@@ -45,12 +59,12 @@ export const quizzRouter = createTRPCRouter({
     name: z.string()
   })).mutation(async ({input}) => {
     const {quizzId, userId, name} = input
-    client.zAdd(`quizz:${quizzId}`, [{score: 0, value: name}])
     try {
       await db.insert(quizzPlayer).values({
         quizzId,
         playerId: userId
       })
+      client.zAdd(`quizz:${quizzId}`, [{score: 0, value: name}])
     } catch (error) {
       console.error(error)
     }
@@ -59,15 +73,15 @@ export const quizzRouter = createTRPCRouter({
     id: z.number(),
     userId: z.number()
   })).query(async ({input}) => {  
-    
+    console.log('Searching for quizz', input)
     return await db.select({
       question: quizz.question,
       completedQuestions: quizzPlayer.completedQuestions,
       score: quizzPlayer.score,
-
+      name: quizz.title
     }).from(quizz)
     .leftJoin(quizzPlayer, eq(quizz.id, quizzPlayer.quizzId))
-    .where(eq(quizz.id, input.id))
+    .where(and(eq(quizz.id, input.id), eq(quizzPlayer.playerId, input.userId)))
     .then(res => res[0])
   }),
   updateQuizz: baseProcedure.input(z.object({
@@ -85,5 +99,20 @@ export const quizzRouter = createTRPCRouter({
       completedQuestions: result.completedQuestions,
       score: result.score
     }).where(and(eq(quizzPlayer.quizzId, quizzId), eq(quizzPlayer.playerId, userId)))
+  }),
+  testGetList: baseProcedure.input(z.object({
+    quizzId: z.number()
+  })).subscription(async function* ({input}): AsyncGenerator<Array<{value: string, score: number}>, void, unknown> {
+    yield await client.zRangeWithScores(`quizz:${input.quizzId}`, 0, 2, {
+      REV: true, // Add REV: true to get scores in descending order
+    })
+    while (true) {
+      const channel = await new Promise<Array<{value: string, score: number}>>(resolve => {
+        ee.once(`${input.quizzId}`, (data) => {
+          resolve(data);
+        });
+      });
+      yield channel;
+    }
   })
 });

@@ -4,7 +4,6 @@ import { Separator } from "@/components/ui/separator"
 
 type Score = {
   name: string;
-  id: number;
   score: number;
 }
 
@@ -17,7 +16,7 @@ export function Scoreboard({ scores, userScore }: ScoreboardProps) {
   const topScores = scores.slice(0, 5);
 
   return (
-    <Card className="w-[250px] absolute top-4 right-4 shadow-lg mt-24">
+    <Card className="w-[250px] absolute top-24 right-4 shadow-lg">
       <CardHeader>
         <CardTitle className="text-lg font-bold text-center">Scoreboard</CardTitle>
       </CardHeader>

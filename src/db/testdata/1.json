@@ -10,93 +10,93 @@
     "answer": "B"
   },
   {
-    "question": "Which word is a synonym for 'happy'?",
-    "options": [
-      "A) Sad",
-      "B) Elated",
-      "C) Angry",
-      "D) Tired"
-    ],
-    "answer": "B"
-  },
-  {
-    "question": "Fill in the blank: They have been friends ___ childhood.",
-    "options": [
-      "A) since",
-      "B) for",
-      "C) during",
-      "D) by"
-    ],
-    "answer": "A"
-  },
-  {
-    "question": "Choose the correctly punctuated sentence.",
-    "options": [
-      "A) It's time to eat, grandma.",
-      "B) Its time to eat grandma.",
-      "C) It's time to eat grandma.",
-      "D) Its time to eat, grandma."
-    ],
-    "answer": "A"
-  },
-  {
-    "question": "What is the antonym of 'increase'?",
-    "options": [
-      "A) Expand",
-      "B) Decrease",
-      "C) Grow",
-      "D) Multiply"
-    ],
-    "answer": "B"
-  },
-  {
-    "question": "Choose the correct preposition: She is good ___ playing the piano.",
+    "question": "Select the appropriate preposition: They arrived ___ the airport on time.",
     "options": [
       "A) at",
-      "B) on",
-      "C) in",
-      "D) with"
+      "B) in",
+      "C) to",
+      "D) on"
     ],
     "answer": "A"
   },
   {
-    "question": "Identify the adjective in the following sentence: The quick brown fox jumps over the lazy dog.",
+    "question": "Choose the correct pronoun: Everyone should bring ___ own lunch.",
     "options": [
-      "A) jumps",
-      "B) over",
-      "C) quick",
-      "D) dog"
+      "A) their",
+      "B) his",
+      "C) her",
+      "D) its"
     ],
-    "answer": "C"
+    "answer": "A"
   },
   {
-    "question": "Which sentence is in the passive voice?",
+    "question": "Select the proper adjective: She has a very ___ personality.",
     "options": [
-      "A) The chef cooked a delicious meal.",
-      "B) A delicious meal was cooked by the chef.",
-      "C) The chef is cooking a meal.",
-      "D) The chef will cook a meal."
+      "A) happily",
+      "B) happy",
+      "C) happiness",
+      "D) happier"
     ],
     "answer": "B"
   },
   {
-    "question": "Choose the correct plural form: One child, two ___",
+    "question": "Choose the correct conjunction: I wanted to go, ___ I was too tired.",
     "options": [
-      "A) childs",
-      "B) children",
-      "C) childrens",
-      "D) childes"
+      "A) and",
+      "B) but",
+      "C) or",
+      "D) so"
     ],
     "answer": "B"
   },
   {
-    "question": "Select the correct conditional sentence:",
+    "question": "Select the appropriate article: She adopted ___ cat from the shelter.",
     "options": [
-      "A) If I was rich, I would travel the world.",
-      "B) If I am rich, I would travel the world.",
-      "C) If I were rich, I would travel the world.",
-      "D) If I will be rich, I would travel the world."
+      "A) a",
+      "B) an",
+      "C) the",
+      "D) no article"
+    ],
+    "answer": "A"
+  },
+  {
+    "question": "Choose the correct tense: By next year, he ___ his degree.",
+    "options": [
+      "A) will complete",
+      "B) completes",
+      "C) has completed",
+      "D) will have completed"
+    ],
+    "answer": "D"
+  },
+  {
+    "question": "Select the correct form: If I ___ you, I would apologize.",
+    "options": [
+      "A) am",
+      "B) was",
+      "C) were",
+      "D) be"
     ],
     "answer": "C"
+  },
+  {
+    "question": "Choose the correct modal verb: You ___ finish your homework before playing.",
+    "options": [
+      "A) can",
+      "B) should",
+      "C) might",
+      "D) would"
+    ],
+    "answer": "B"
+  },
+  {
+    "question": "Select the proper adverb: She sings ___ in the choir.",
+    "options": [
+      "A) beautiful",
+      "beautifully",
+      "beauty",
+      "more beautiful"
+    ],
+    "answer": "B"
   }
 ]
